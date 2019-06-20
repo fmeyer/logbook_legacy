@@ -27,6 +27,7 @@ printf "\n**%s**\n" "$TS" >> "$FILENAME"
 # and don't create a swap file
 vim -u NONE + -n --noplugin "$FILENAME"
 
+# Sidebar index generation
 
 tree=$(tree notes -tf --noreport -I '*~' --charset ascii $1 |
        sed -e 's/| \+/  /g' -e 's/[|`]-\+/ */g' -e 's:\(* \)\(\(.*/\)\([^/]\+\)\):\1[\4](\4):g' -e 's/\.md//g')
