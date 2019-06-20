@@ -21,8 +21,21 @@ else
 fi
 
 # appends the current date and timestamp to the end of the file
-printf "\n**%s**\n" "$DS $TS" >> "$FILENAME"
+printf "\n**%s**\n" "$TS" >> "$FILENAME"
 
 # starts vim without loading any plugins, starts the cursor at the end of the file
 # and don't create a swap file
-vim -u NONE + -n --noplugin "$FILENAME" && git add . && git commit --quiet -am "Updating $FILENAME entry on $TS" && echo "uploading" && git push --quiet
+vim -u NONE + -n --noplugin "$FILENAME"
+
+
+tree=$(tree notes -tf --noreport -I '*~' --charset ascii $1 |
+       sed -e 's/| \+/  /g' -e 's/[|`]-\+/ */g' -e 's:\(* \)\(\(.*/\)\([^/]\+\)\):\1[\4](\4):g' -e 's/\.md//g')
+
+printf "%s\n" "$tree" > _Sidebar.md
+
+tree=$(tree logs -tfr --noreport -I '*~' --charset ascii $1 |
+       sed -e 's/| \+/  /g' -e 's/[|`]-\+/ */g' -e 's:\(* \)\(\(.*/\)\([^/]\+\)\):\1[\4](\4):g' -e 's/\.md//g')
+
+printf "\n\n%s\n" "$tree" >> _Sidebar.md
+
+git add . && git commit --quiet -am "Updating $FILENAME entry on $TS" && echo "uploading" && git push --quiet
