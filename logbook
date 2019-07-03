@@ -15,19 +15,20 @@ fi
 # check if the first paramether is a note, otherwise points to
 # a log entry
 if [[ -n $1 ]]; then
+  TS="$(date +'%d.%m.%Y') $TS"
   FILENAME=notes/$1.md
 else
   FILENAME=logs/$YEAR/$DS.md
 fi
 
+git pull --quiet --rebase
 # appends the current date and timestamp to the end of the file
 printf "\n**%s**\n" "$TS" >> "$FILENAME"
 
 # starts vim without loading any plugins, starts the cursor at the end of the file
 # and don't create a swap file
-vim -u NONE + -n --noplugin "$FILENAME"
+vim -u NONE --cmd "set tw=79" + -n --noplugin "$FILENAME"
 
-# Sidebar index generation
 
 tree=$(tree notes -tf --noreport -I '*~' --charset ascii $1 |
        sed -e 's/| \+/  /g' -e 's/[|`]-\+/ */g' -e 's:\(* \)\(\(.*/\)\([^/]\+\)\):\1[\4](\4):g' -e 's/\.md//g')
