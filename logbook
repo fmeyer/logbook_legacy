@@ -1,17 +1,13 @@
 #!/bin/bash
-
 cd ~/code/logdata.wiki/ || exit
-
 TS=$(date +'%H:%M:%S')
 DS=$(date +'%Y-%m-%d')
 YEAR=$(date +'%Y')
 CURRENT_LOG_DIR="logs/$YEAR/"
-
 # check if current log year exists, creates if no
 if [ ! -d "$CURRENT_LOG_DIR" ]; then
   mkdir -p "$CURRENT_LOG_DIR"
 fi
-
 # check if the first paramether is a note, otherwise points to
 # a log entry
 if [[ -n $1 ]]; then
@@ -20,24 +16,16 @@ if [[ -n $1 ]]; then
 else
   FILENAME=logs/$YEAR/$DS.md
 fi
-
 git pull --quiet --rebase
 # appends the current date and timestamp to the end of the file
 printf "\n**%s**\n" "$TS" >> "$FILENAME"
-
 # starts vim without loading any plugins, starts the cursor at the end of the file
 # and don't create a swap file
 vim -u NONE --cmd "set tw=79" + -n --noplugin "$FILENAME"
-
-
 tree=$(tree notes -tf --noreport -I '*~' --charset ascii $1 |
        sed -e 's/| \+/  /g' -e 's/[|`]-\+/ */g' -e 's:\(* \)\(\(.*/\)\([^/]\+\)\):\1[\4](\4):g' -e 's/\.md//g')
-
 printf "%s\n" "$tree" > _Sidebar.md
-
 tree=$(tree logs -tfr --noreport -I '*~' --charset ascii $1 |
        sed -e 's/| \+/  /g' -e 's/[|`]-\+/ */g' -e 's:\(* \)\(\(.*/\)\([^/]\+\)\):\1[\4](\4):g' -e 's/\.md//g')
-
 printf "\n\n%s\n" "$tree" >> _Sidebar.md
-
-git add . && git commit --quiet -am "Updating $FILENAME entry on $TS" && echo "uploading" && git push --quiet
+git add . && git commit --quiet -am "Updating $FILENAME entry on $TS" && echo "syncing" && git push --quiet
